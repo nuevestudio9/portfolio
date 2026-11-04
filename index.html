@@ -33,6 +33,7 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{scroll-behavior:smooth}
 body{background:var(--black);color:var(--white);font-family:var(--sans);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:90;background:var(--black)}
@@ -351,6 +352,8 @@ form{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .chk input{width:18px;height:18px;margin-top:2px;accent-color:#fff;flex:none}
 .ffoot{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:6px}
 .result{grid-column:1/-1;border:1px solid rgba(255,255,255,.2);border-radius:24px;padding:24px;display:grid;gap:14px}
+.hp{position:absolute!important;left:-9999px;width:1px;height:1px;opacity:0}
+.result.ok{border-color:rgba(139,224,164,.5)}
 .result strong{font-size:20px;text-transform:uppercase}
 .result pre{white-space:pre-wrap;font-family:var(--mono);font-size:12px;background:#0b0b0b;border-radius:14px;padding:16px;margin:0;max-height:260px;overflow:auto}
 .result .acts{display:flex;gap:14px;flex-wrap:wrap}
@@ -677,9 +680,14 @@ form{display:grid;grid-template-columns:1fr 1fr;gap:16px}
           <div class="f full"><label for="contesto">Altro da sapere <span class="o">(facoltativo)</span></label><textarea id="contesto" name="contesto" rows="3"></textarea><span class="err"></span></div>
           <div class="f full"><label class="chk" for="privacy"><input type="checkbox" id="privacy" name="privacy" required><span>Ho letto l'<a href="#privacy">informativa privacy</a> e acconsento al trattamento dei dati per ricevere una risposta.</span></label><span class="err" aria-live="polite"></span></div>
           <div class="ffoot"><span class="lab">Campi senza nota obbligatori</span><button class="glass light" type="submit">Invia la richiesta</button></div>
+          <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <div class="result ok" id="sent" hidden tabindex="-1">
+            <strong>Richiesta inviata</strong>
+            <p style="color:#c4c4c1">Grazie! Ho ricevuto la tua richiesta e ti rispondo entro 24–48 ore lavorative all'email che hai indicato.</p>
+          </div>
           <div class="result" id="result" hidden tabindex="-1">
-            <strong>Richiesta pronta, non ancora inviata</strong>
-            <p style="color:#c4c4c1">Il modulo non è ancora collegato a un servizio di invio: lo sarà prima della messa online. Per ora copia il messaggio e mandalo via email o WhatsApp.</p>
+            <strong id="resTitle">Richiesta pronta, non ancora inviata</strong>
+            <p style="color:#c4c4c1" id="resText">Il modulo non è ancora collegato a un servizio di invio. Per ora copia il messaggio e mandalo via email o WhatsApp.</p>
             <pre id="msg"></pre>
             <div class="acts"><button class="glass light" type="button" id="copyMsg">Copia il messaggio</button><a class="glass" id="waMsg" href="https://wa.me/393343639173" target="_blank" rel="noopener">Apri WhatsApp</a></div>
             <span class="lab" id="copyState" aria-live="polite"></span>
@@ -715,28 +723,39 @@ form{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   <article class="wrap legal">
     <a class="back" href="#top">← Torna al sito</a>
     <h1>Informativa privacy</h1>
-    <p><span class="todo">Struttura da completare e verificare con un consulente prima della pubblicazione</span></p>
+    <p class="lab" style="margin-bottom:10px">Ultimo aggiornamento: novembre 2026</p>
     <h2>Titolare del trattamento</h2>
-    <p>Yatazil Farouk, NUEVE. Partita IVA: IT04253760369. Libero professionista. Email: nueve9production@icloud.com.</p>
+    <p>Yatazil Farouk, NUEVE Studio, libero professionista. Partita IVA: IT04253760369. Email: nueve9production@icloud.com.</p>
     <h2>Quali dati raccogliamo</h2>
-    <p>I dati inseriti nel modulo di contatto: nome, azienda, email, sito o profilo, informazioni sul progetto.</p>
-    <h2>Perché e per quanto tempo</h2>
-    <p>Per rispondere alla richiesta e preparare un eventuale preventivo. Durata di conservazione: <span class="todo">Da definire</span>.</p>
+    <p>Solo i dati che inserisci nel modulo di contatto: nome, azienda o brand, email, sito o profilo social (facoltativo), tipo di progetto, tempistiche, obiettivo, budget indicativo (facoltativo) ed eventuali note. Il sito non usa strumenti di profilazione o statistiche.</p>
+    <h2>Perché li usiamo</h2>
+    <p>Per rispondere alla tua richiesta e, se lo chiedi, preparare un preventivo. La base giuridica è l'esecuzione di misure precontrattuali richieste da te (art. 6.1.b GDPR).</p>
+    <h2>Per quanto tempo</h2>
+    <p>Per il tempo necessario a gestire la richiesta e comunque non oltre 24 mesi dall'ultimo contatto. Se nasce una collaborazione, i dati legati a preventivi e fatture sono conservati per il periodo previsto dalla normativa fiscale.</p>
     <h2>Servizi esterni</h2>
-    <ul><li>Servizio di invio del modulo: <span class="todo">Da definire</span></li><li>Hosting del sito: <span class="todo">Da definire</span></li><li>Analytics: <span class="todo">Da definire</span></li></ul>
+    <ul>
+      <li><b>Cloudflare</b> (hosting e sicurezza del sito): tratta dati tecnici come l'indirizzo IP per far funzionare e proteggere il sito.</li>
+      <li><b>Web3Forms</b> (invio del modulo): inoltra il contenuto del modulo alla nostra email.</li>
+      <li><b>WhatsApp</b> (Meta): solo se scegli di contattarci tramite il link WhatsApp, si applica l'informativa di WhatsApp.</li>
+    </ul>
+    <p>Alcuni di questi fornitori possono trattare dati anche fuori dall'Unione Europea, con le garanzie previste dal GDPR.</p>
     <h2>I tuoi diritti</h2>
-    <p>Puoi chiedere accesso, rettifica o cancellazione dei tuoi dati scrivendo all'indirizzo email indicato sopra.</p>
+    <p>Puoi chiedere in qualsiasi momento accesso, rettifica, cancellazione o limitazione dei tuoi dati, o opporti al trattamento, scrivendo all'email indicata sopra. Hai anche il diritto di presentare reclamo al Garante per la protezione dei dati personali (garanteprivacy.it).</p>
   </article>
 </div>
 <div class="view" id="v-cookie" hidden>
   <article class="wrap legal">
     <a class="back" href="#top">← Torna al sito</a>
     <h1>Cookie</h1>
-    <p><span class="todo">Da completare in base agli strumenti effettivamente installati</span></p>
+    <p class="lab" style="margin-bottom:10px">Ultimo aggiornamento: novembre 2026</p>
+    <h2>Cookie usati da questo sito</h2>
+    <p>Questo sito non usa cookie di profilazione, di marketing o di statistica, e non installa strumenti di tracciamento di terze parti. Per questo non serve un banner di consenso.</p>
     <h2>Cookie tecnici</h2>
-    <p>Questa versione del sito non installa cookie di profilazione.</p>
-    <h2>Analytics</h2>
-    <p>Se verrà aggiunto uno strumento di statistica, qui saranno indicati nome, finalità e modalità di consenso.</p>
+    <p>Cloudflare, che ospita il sito, può impostare cookie tecnici strettamente necessari alla sicurezza (ad esempio per bloccare traffico automatico). Non servono a profilarti e non richiedono consenso.</p>
+    <h2>Font e contenuti</h2>
+    <p>Font, immagini e video sono caricati direttamente da questo sito, senza servizi esterni come Google Fonts.</p>
+    <h2>Modifiche</h2>
+    <p>Se in futuro verranno aggiunti strumenti di statistica o di marketing, questa pagina sarà aggiornata e ti verrà chiesto il consenso prima di attivarli.</p>
   </article>
 </div>
 </main>
@@ -1015,6 +1034,8 @@ form{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   }
   document.querySelectorAll('button[data-copy]').forEach(function(b){var o=b.textContent;b.addEventListener('click',function(){copyText(b.dataset.copy,function(ok){b.textContent=ok?'Copiato':'Seleziona e copia';setTimeout(function(){b.textContent=o},2000)})})});
 
+  // Chiave Web3Forms (web3forms.com): incollala qui per attivare l'invio del modulo
+  var W3F_KEY='1d98df6a-6965-4581-ac06-38f9816d8725';
   var form=document.getElementById('form'),result=document.getElementById('result'),msgEl=document.getElementById('msg');
   var errs={nome:'Scrivi il tuo nome.',azienda:'Indica il nome dell\'azienda o del brand.',email:'Inserisci un indirizzo email valido, es. nome@azienda.it.',tipo:'Scegli il tipo di progetto.',tempi:'Scegli una tempistica indicativa.',obiettivo:'Descrivi in una frase cosa vuoi ottenere.',privacy:'Serve il consenso per poterti rispondere.'};
   function check(el){var f=el.closest('.f'),e=f.querySelector('.err'),ok=el.type==='checkbox'?el.checked:(el.checkValidity()&&el.value.trim()!=='');f.setAttribute('aria-invalid',ok?'false':'true');if(e)e.textContent=ok?'':(errs[el.name]||'');return ok}
@@ -1025,7 +1046,20 @@ form{display:grid;grid-template-columns:1fr 1fr;gap:16px}
     if(first){first.focus();return}
     var d=new FormData(form),text=['Nuova richiesta di progetto, NUEVE','','Nome: '+d.get('nome'),'Azienda: '+d.get('azienda'),'Email: '+d.get('email'),'Sito/social: '+(d.get('sito')||'-'),'Tipo di progetto: '+d.get('tipo'),'Tempistiche: '+d.get('tempi'),'Obiettivo: '+d.get('obiettivo'),'Budget: '+(d.get('budget')||'Da parlarne in consulenza'),'Altro: '+(d.get('contesto')||'-')].join('\n');
     msgEl.textContent=text;document.getElementById('waMsg').href='https://wa.me/393343639173?text='+encodeURIComponent(text);
-    result.hidden=false;result.focus();
+    function fallback(title,body){document.getElementById('resTitle').textContent=title;document.getElementById('resText').textContent=body;result.hidden=false;result.focus()}
+    if(!W3F_KEY){fallback('Richiesta pronta, non ancora inviata','Il modulo non \u00e8 ancora collegato a un servizio di invio. Per ora copia il messaggio e mandalo via email o WhatsApp.');return}
+    if(d.get('botcheck'))return;
+    var btn=form.querySelector('button[type=submit]'),label=btn.textContent;btn.disabled=true;btn.textContent='Invio in corso\u2026';result.hidden=true;
+    var payload={access_key:W3F_KEY,subject:'Nuova richiesta dal sito: '+d.get('azienda'),from_name:'Sito NUEVE Studio',replyto:d.get('email'),
+      nome:d.get('nome'),azienda:d.get('azienda'),email:d.get('email'),sito:d.get('sito')||'-',tipo:d.get('tipo'),tempistiche:d.get('tempi'),obiettivo:d.get('obiettivo'),budget:d.get('budget')||'Da parlarne in consulenza',altro:d.get('contesto')||'-'};
+    fetch('https://api.web3forms.com/submit',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(payload)})
+      .then(function(r){return r.json().catch(function(){return {success:false}})})
+      .then(function(j){
+        if(j&&j.success){form.querySelectorAll('.f').forEach(function(f){f.hidden=true});form.querySelector('.ffoot').hidden=true;var ok=document.getElementById('sent');ok.hidden=false;ok.focus()}
+        else fallback('Invio non riuscito','Qualcosa non ha funzionato. Copia il messaggio e mandalo via email o WhatsApp: ti rispondo lo stesso.');
+      })
+      .catch(function(){fallback('Invio non riuscito','Connessione non disponibile. Copia il messaggio e mandalo via email o WhatsApp: ti rispondo lo stesso.')})
+      .then(function(){btn.disabled=false;btn.textContent=label});
   });
   document.getElementById('copyMsg').addEventListener('click',function(){copyText(msgEl.textContent,function(ok){document.getElementById('copyState').textContent=ok?'Copiato. Incollalo in una email a nueve9production@icloud.com.':'Testo selezionato: copialo manualmente.'})});
   document.querySelectorAll('[data-pack]').forEach(function(a){a.addEventListener('click',function(){var t=document.getElementById('tipo');if(t)t.value=a.dataset.pack})});
