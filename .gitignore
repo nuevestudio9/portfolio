@@ -5,3 +5,6 @@ _t.html
 .DS_Store
 node_modules/
 .wrangler/
+
+# script locale per pubblicare
+pubblica.command
